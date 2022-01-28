@@ -21,8 +21,6 @@ ControlBurn works on python 3.7 or above. The following packages are required.
 -   numpy (1.20.1)
 -   pandas (1.2.4)
 -   sklearn (0.24.1)
--   mosek (9.2.47)
--   cvxpy (1.1.13)
 
 ### Quick Start
 ```python
