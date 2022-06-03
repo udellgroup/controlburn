@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from itertools import permutations
 
+#TODO: InterpretClassifier class
+
 class InterpretRegressor:
     cb = None
     X = None
@@ -12,28 +14,33 @@ class InterpretRegressor:
 
     #initializer
     def __init__(self, ControlBurnRegressor, X,y):
+    """ Initalize an interpreter class object, requires a ControlBurnRegressor
+    class to initalize.
+    """
         self.cb = ControlBurnRegressor
         self.X =  X
         self.y = y
 
-    """ Lists the features used in each tree of the selected subforest to
-    give a sense of model structure, returns the array of features used
-    """
-    def list_subforest(self, verbose = False):
+
+    def list_subforest(self, show_plot = False):
+        """ Lists the features used in each tree of the selected subforest to
+        give a sense of model structure, returns the array of features used
+        """
         tree_list = self.cb.subforest
         cols = self.X.columns
         features_used = []
         for tree1 in tree_list:
             features_used.append(cols[tree1.feature_importances_ > 0].values)
-            if verbose == True:
+            if show_plot == True:
                 print(cols[tree1.feature_importances_ > 0].values)
         return features_used
 
 
-    """ Plot a shape function that demonstrates the contribution of single
-    feature trees on the response.
-    """
-    def plot_single_feature_shape(self, feature, show = True):
+
+    def plot_single_feature_shape(self, feature, show_plot = True):
+        """ Plot a shape function that demonstrates the contribution of single
+        feature trees on the response.
+        """
         tree_list = self.cb.subforest
         cols = self.X.columns
         sub_weights = self.cb.weights[self.cb.weights>0]
@@ -67,7 +74,10 @@ class InterpretRegressor:
             print('No single feature trees found for feature: ' + feature)
             return None
 
-    def plot_pairwise_interactions(self,feature1,feature2,show = True):
+    def plot_pairwise_interactions(self,feature1,feature2,show_plot = True):
+        """Plot a heatmap showing impact of pairwise interaction on
+        the response.
+        """
         tree_list = self.cb.subforest
         cols = self.X.columns
         sub_weights = self.cb.weights[self.cb.weights>0]
@@ -95,12 +105,13 @@ class InterpretRegressor:
         df['contribution'] = pred_all
         df['contribution'] = df['contribution'].round(3)
 
-        df_plot = df.pivot_table(index=feature1,
-                    columns=feature2, values='contribution')
-        if show == True:
-            heatmap = sns.heatmap(df_plot , cmap = 'RdBu'
+        df_plot = df.pivot_table(index=feature2,
+                    columns=feature1, values='contribution')
+        if show_plot == True:
+            heatmap = sns.heatmap(df_plot , cmap='RdYlGn_r'
                             , fmt='.4f', center = 0,
                             cbar_kws={'label': 'Contribution to prediction'})
+            heatmap.invert_yaxis()
             plt.title('Pairwise interactions: ' + feature1 +', ' + feature2)
             #trim formating
             #color scale so 0 white
@@ -108,9 +119,7 @@ class InterpretRegressor:
 
         #TODO: plotting shape function (combine) interpret.plot
 
-
-
-    def plot_regularization_path(self, verbose = True):
+    def plot_regularization_path(self, show_plot = True , more_colors = False):
         """ Plot the LASSO regularization path for a ControlBurnRegressor.
         Feature importance for a feature computed as the weighted sum of
         feature importances for each tree in the selected subforest.
@@ -143,13 +152,18 @@ class InterpretRegressor:
         results = pd.DataFrame(results,columns = feats)
         results['penalties'] = alphas
 
-        if verbose == True:
-            plt.figure(figsize = (12,9))
+        if show_plot == True:
+            fig = plt.figure(figsize = (12,9))
+            ax1 = fig.add_subplot(111)
+            if more_colors > 0:
+                colormap = plt.cm.nipy_spectral
+                ax1.set_prop_cycle(color = [colormap(i) \
+                        for i in np.linspace(0, 1,more_colors)])
             for i in feats:
-                plt.plot(np.log(results['penalties']),results[i], label = i)
-            plt.legend()
-            plt.xlabel('Log Regularization Penalty')
-            plt.ylabel('Weighted Feature Importance')
-            plt.title('LASSO Regularization Path')
+                ax1.plot(np.log(results['penalties']),results[i], label = i)
+            ax1.legend()
+            ax1.set_xlabel('Log Regularization Penalty')
+            ax1.set_ylabel('Weighted Feature Importance')
+            ax1.set_title('LASSO Regularization Path')
 
         return results
