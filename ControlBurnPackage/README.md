@@ -1,16 +1,16 @@
 
-## ControlBurn v0.1.1
+## ControlBurn v0.1.3
 
 This package implements ControlBurn in python. ControlBurn is a feature selection algorithm that uses a weighted LASSO-based feature selection to prune unnecessary features from tree ensembles. The algorithm is efficient and only requires a single training iteration to run.
 
-Tree ensembles distribute feature importance scores evenly amongst groups of correlated features. The average feature ranking of the correlated group is suppressed, which reduces interpretability and complicates feature selection. Like the linear LASSO, ControlBurn assigns all the feature importance of a correlated group of features to a single feature. The algorithm is able to quickly select a subset of important independent features for further analysis. See the notebook directory for a detailed example of ControlBurn on the California housing dataset.
+Tree ensembles distribute feature importance scores evenly amongst groups of correlated features. The average feature ranking of the correlated group is suppressed, which reduces interpretability and complicates feature selection. Like the linear LASSO, ControlBurn assigns all the feature importance of a correlated group of features to a single feature. The algorithm is able to quickly select a subset of important independent features for further analysis.
 
 
 ### Installation
 
 The easiest way to install ControlBurn is through pip.
 ```sh
-!pip install ControlBurn==0.1.1
+!pip install ControlBurn==0.1.3
 ```
 
 
@@ -21,6 +21,8 @@ ControlBurn works on python 3.7 or above. The following packages are required.
 -   numpy (1.20.1)
 -   pandas (1.2.4)
 -   sklearn (0.24.1)
+-   mosek (9.2.47)
+-   cvxpy (1.1.13)
 
 ### Quick Start
 ```python

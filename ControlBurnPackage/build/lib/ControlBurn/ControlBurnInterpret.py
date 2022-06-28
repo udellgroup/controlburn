@@ -5,8 +5,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from itertools import permutations
 
-#TODO: InterpretClassifier class
-
 class InterpretRegressor:
     cb = None
     X = None
@@ -14,33 +12,28 @@ class InterpretRegressor:
 
     #initializer
     def __init__(self, ControlBurnRegressor, X,y):
-    """ Initalize an interpreter class object, requires a ControlBurnRegressor
-    class to initalize.
-    """
         self.cb = ControlBurnRegressor
         self.X =  X
         self.y = y
 
-
-    def list_subforest(self, show_plot = False):
-        """ Lists the features used in each tree of the selected subforest to
-        give a sense of model structure, returns the array of features used
-        """
+    """ Lists the features used in each tree of the selected subforest to
+    give a sense of model structure, returns the array of features used
+    """
+    def list_subforest(self, verbose = False):
         tree_list = self.cb.subforest
         cols = self.X.columns
         features_used = []
         for tree1 in tree_list:
             features_used.append(cols[tree1.feature_importances_ > 0].values)
-            if show_plot == True:
+            if verbose == True:
                 print(cols[tree1.feature_importances_ > 0].values)
         return features_used
 
 
-
-    def plot_single_feature_shape(self, feature, show_plot = True):
-        """ Plot a shape function that demonstrates the contribution of single
-        feature trees on the response.
-        """
+    """ Plot a shape function that demonstrates the contribution of single
+    feature trees on the response.
+    """
+    def plot_single_feature_shape(self, feature, show = True):
         tree_list = self.cb.subforest
         cols = self.X.columns
         sub_weights = self.cb.weights[self.cb.weights>0]
@@ -74,10 +67,8 @@ class InterpretRegressor:
             print('No single feature trees found for feature: ' + feature)
             return None
 
-    def plot_pairwise_interactions(self,feature1,feature2,show_plot = True):
-        """Plot a heatmap showing impact of pairwise interaction on
-        the response.
-        """
+    def plot_pairwise_interactions(self,feature1,feature2,show = True):
+
         tree_list = self.cb.subforest
         cols = self.X.columns
         sub_weights = self.cb.weights[self.cb.weights>0]
@@ -107,7 +98,7 @@ class InterpretRegressor:
 
         df_plot = df.pivot_table(index=feature2,
                     columns=feature1, values='contribution')
-        if show_plot == True:
+        if show == True:
             heatmap = sns.heatmap(df_plot , cmap='RdYlGn_r'
                             , fmt='.4f', center = 0,
                             cbar_kws={'label': 'Contribution to prediction'})
@@ -119,7 +110,9 @@ class InterpretRegressor:
 
         #TODO: plotting shape function (combine) interpret.plot
 
-    def plot_regularization_path(self, show_plot = True , more_colors = False):
+
+
+    def plot_regularization_path(self, verbose = True , more_colors = False):
         """ Plot the LASSO regularization path for a ControlBurnRegressor.
         Feature importance for a feature computed as the weighted sum of
         feature importances for each tree in the selected subforest.
@@ -152,7 +145,7 @@ class InterpretRegressor:
         results = pd.DataFrame(results,columns = feats)
         results['penalties'] = alphas
 
-        if show_plot == True:
+        if verbose == True:
             fig = plt.figure(figsize = (12,9))
             ax1 = fig.add_subplot(111)
             if more_colors > 0:

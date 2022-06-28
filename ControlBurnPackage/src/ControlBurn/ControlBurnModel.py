@@ -1,3 +1,11 @@
+"""
+ControlBurnModel.py
+===============================
+This module contains functions to build and burn forests and select
+hyperparameters
+
+"""
+
 import warnings
 import sklearn
 from sklearn.tree import DecisionTreeRegressor
@@ -10,22 +18,84 @@ from sklearn.linear_model import lasso_path
 from sklearn.model_selection import KFold
 import numpy as np
 import pandas as pd
-import mosek
-import cvxpy as cp
 import matplotlib.pyplot as plt
 
 warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 
 class ControlBurnClassifier:
+    """
+    Attributes
+    ----------
+    alpha: float
+        Regularization hyperparameter.
+    max_depth: float
+        Maximum depth of trees to grow in the ensemble.
+    threshold: float
+        Convergence threshold.
+    tail: int
+        Number of iterations to check convergence on.
+    forest: list
+        List of DecisionTreeRegressor objects. Represents the full ensemble.
+    subforest: list
+        List of DecisionTreeRegressor objects. Represents the sparse ensemble.
+    features_selected_: list
+        List of features selected by the subforest.
+    feature_importances_: list
+        List of feature importance scores computed from the subforest.
+    weights: list
+        Solution coefficients to the LASSO optimization problem.
+    alpha_range:
+        Range of alphas enumerated when computing the regularization path.
+    coef_path:
+        LASSO solution coefficients obtained by computing the regularization path.
+    polish_method: function
+        Method used to polish the final model on the selected features.
 
+    """
     # Class attributes to store results.
     forest = []
     weights = []
     subforest = []
+    feature_importances_ = []
+    alpha_range = []
+    coef_path = []
 
     #Class attributes for parameters to determine convergence.
     threshold = 10**-3
     tail = 5
+
+    #Fit arguments
+    max_depth = 10
+    alpha = 0.1
+    polish_method = RandomForestClassifier()
+
+    def __init__(self,alpha = 0.1,max_depth = 10, build_forest_method = 'bagboost',
+                    polish_method = RandomForestClassifier(max_features = 'sqrt'), custom_forest = []):
+
+        if build_forest_method not in ['bagboost','bag','doublebagboost','custom']:
+            raise ValueError("build_forest_method must be either 'bag', 'bagboost', 'doublebagboost', or 'custom' ")
+
+        if max_depth <= 0:
+            raise ValueError("max_depth must be greater than 0")
+
+        if alpha <= 0:
+            raise ValueError("alpha must be greater than 0")
+
+        self.alpha = alpha
+        self.max_depth = max_depth
+
+        if  build_forest_method == 'bagboost':
+            self.build_forest_method = self.bagboost_forest
+        elif build_forest_method == 'bag':
+            self.build_forest_method = self.bag_forest
+        elif build_forest_method == 'doublebagboost':
+            self.build_forest_method = self.double_bagboost_forest
+
+        elif build_forest_method == 'custom':
+            if len(custom_forest) == 0:
+                raise ValueError("Must provide external tree list")
+            self.forest = custom_forest
+            self.build_forest_method = self.__skip_build_forest
 
     # Private Helper Methods
     def __log_odds_predict(self,X,log_odds_init,tree_list):
@@ -68,13 +138,90 @@ class ControlBurnClassifier:
         else:
             return False
 
+    def __skip_build_forest(self,X,y):
+        """ Overide function to skip building a forest for custom ensembles
+        """
+        self.X = X
+        self.y = y
+        return
+
+        def __solve_lasso_cvxpy(self):
+            """ Solves LASSO optimization problem using class attribute alpha as the
+            regularization parameter. Stores the selected features, weights, and
+            subforest.
+            """
+            if len(self.forest) == 0:
+                raise Exception("Build forest first.")
+            alpha = self.alpha
+            X = self.X
+            y = self.y
+            y = pd.Series(y)
+            y.index = X.index
+            tree_list = self.forest
+            pred = []
+            ind = []
+
+            if type(tree_list[0]) == sklearn.tree._classes.DecisionTreeClassifier:
+                for tree in tree_list:
+                    pred.append(tree.predict_proba(X)[:,1])
+                    ind.append([int(x > 0) for x in tree.feature_importances_])
+
+            else:
+                for tree in tree_list:
+                    pred.append(tree.predict(X))
+                    ind.append([int(x > 0) for x in tree.feature_importances_])
+
+            pred = np.transpose(pred)
+            ind = np.transpose(ind)
+            w = cp.Variable(len(tree_list),nonneg=True)
+            constraints = []
+
+            if self.optimization_form == 'penalized':
+                loss = -cp.sum( cp.multiply(y, pred@ w ) - cp.logistic(pred @ w) )
+                objective = (1/len(y))*loss + alpha*cp.norm(cp.matmul(ind,w),1)
+
+
+            if self.optimization_form == 'constrained':
+                objective = -cp.sum(cp.multiply(y, pred@ w) - cp.logistic(pred @ w))
+                constraints = [cp.norm(cp.matmul(ind,w),1)<= alpha]
+
+            prob = cp.Problem(cp.Minimize(objective),constraints)
+
+            if self.solver == 'MOSEK':
+                prob.solve(solver = cp.MOSEK,mosek_params = {mosek.dparam.optimizer_max_time: 10000.0} )
+            else:
+                prob.solve(solver = self.solver)
+
+            weights = np.asarray(w.value)
+            weights[np.abs(weights) < self.threshold] = 0
+            self.weights = weights
+            self.subforest = list(np.array(tree_list)[[w_ind != 0 for w_ind in list(weights)]])
+            imp = []
+
+            for i in range(0,len(weights)):
+                imp.append(weights[i]*tree_list[i].feature_importances_)
+            imp1 = np.sum(imp, axis = 0)
+            self.feature_importances_ = imp1
+            self.features_selected_ = list(np.array(X.columns)[[i != 0 for i in imp1]])
+
+            return
+
     #Forest Growing Methods
     def bag_forest(self,X,y):
-        """ Forest growing algorithm that uses the class attribute max_depth as
+        """
+         Forest growing algorithm that uses the class attribute max_depth as
         a hyperparameter.
         Adds trees of increasing depth to a bagged ensemble until max_depth is
         reached. The number of trees to add at each depth level is determined by
         checking if the training error converges.
+
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data
+        y: numpy 1darray or pandas.Series
+            Input targets
+
         """
 
         self.X = X
@@ -113,7 +260,15 @@ class ControlBurnClassifier:
         trees to grow at each boosting iteration is determined by the convergence of
         the training error. Out-of-bag error is used to determine how many boosting iterations to
         conduct.
+
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data.
+        y: numpy 1darray or pandas.Series
+            Input targets.
         """
+
         threshold = self.threshold
         tail = self.tail
         self.X = X
@@ -205,10 +360,18 @@ class ControlBurnClassifier:
         return
 
     def double_bagboost_forest(self,X,y):
-        """ double bag-boosting forest growing algorithm, no hyperparameters needed. The number of
+        """ Double bag-boosting forest growing algorithm, no hyperparameters needed. The number of
         trees to grow at each boosting iteration is determined by the convergence of
         the training error. Out-of-bag error is used to determine how many boosting iterations to
         conduct.
+
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data.
+        y: numpy 1darray or pandas.Series
+            Input targets.
+
         """
         threshold = self.threshold
         tail = self.tail
@@ -326,71 +489,74 @@ class ControlBurnClassifier:
         return
 
 
-    #optional arguments
-    max_depth = 10
-    build_forest_method = bagboost_forest
-    polish_method = RandomForestClassifier()
-    alpha = 0.1
-    solver = 'ECOS_BB'
-    optimization_form= 'penalized'
-
-    #initializer
-    def __init__(self,alpha = 0.1,max_depth = 10, optimization_form= 'penalized',solver = 'ECOS_BB',build_forest_method = 'bagboost',
-    polish_method = RandomForestClassifier(max_features = 'sqrt')):
-        """
-        Initalizes a ControlBurnClassifier object. Arguments: {alpha: regularization parameter, max_depth: optional
-        parameter for incremental depth bagging, optimization_form: either 'penalized' or 'constrained', solver: cvxpy solver
-        used to solve optimization problem, build_forest_method: either 'bagboost' or 'bag',polish_method: final model to
-        fit on selected features}.
-        """
-        if optimization_form not in ['penalized','constrained']:
-            raise ValueError("optimization_form must be either 'penalized' or 'constrained ")
-
-        if build_forest_method not in ['bagboost','bag','doublebagboost']:
-            raise ValueError("build_forest_method must be either 'bag', 'bagboost', or 'doublebagboost' ")
-
-        if max_depth <= 0:
-            raise ValueError("max_depth must be greater than 0")
-
-        if alpha <= 0:
-            raise ValueError("alpha must be greater than 0")
-
-        self.alpha = alpha
-        self.max_depth = max_depth
-        self.optimization_form = optimization_form
-        self.solver = solver
-        self.polish_method = polish_method
-
-        if  build_forest_method == 'bagboost':
-            self.build_forest_method = self.bagboost_forest
-        elif build_forest_method == 'bag':
-            self.build_forest_method = self.bag_forest
-        elif build_forest_method == 'doublebagboost':
-            self.build_forest_method = self.double_bagboost_forest
-
 
     #Optimization Method
+    def solve_lasso(self, costs = [], groups = [], sketching = 1.0):
+        """ Solves LASSO optimization problem using class attribute alpha as the
+        regularization parameter. Stores the selected features, weights, and
+        subforest.
 
-    def solve_lasso(self): #TODO: Finish
+        Parameters
+        ----------
+        costs: numpy 1darray
+            List of feature costs.
+        groups: numpy 1darray
+            List of feature groupings.
+        sketching: float
+            Proportion of training data to use for gaussian sketching.
+
+        """
         if len(self.forest) == 0:
             raise Exception("Build forest first.")
+
+        if len(groups) >0:
+            X = self.X
+            group_matrix = np.column_stack((np.arange(len(X.columns))
+                                            ,groups,np.ones(len(X.columns))))
+            group_matrix = pd.DataFrame(group_matrix,
+                                        columns = ['feature','group','ind'])
+            group_matrix = group_matrix.pivot_table(index = 'feature', columns = 'group',
+                                values = 'ind').fillna(0).astype(int).values
+            group_matrix = np.transpose(group_matrix)
+
+        if sketching < 1.0:
+            X = self.X
+            y = self.y
+            nsample = int(np.floor(len(y)*sketching))
+            to_sample = X.copy()
+            to_sample['y'] = y
+            to_sample = to_sample.sample(n = nsample)
+            y = to_sample['y']
+            X = to_sample.drop('y',axis = 1)
+            y.index = X.index
+        else:
+            X = self.X
+            y = self.y
+            y = pd.Series(y)
+            y.index = X.index
+
         alpha = self.alpha
-        X = self.X
-        y = self.y
-        y = pd.Series(y)
-        y.index = X.index
         tree_list = self.forest
         pred = []
         ind = []
 
-        if type(tree_list[0]) == sklearn.tree._classes.DecisionTreeClassifier:
-            for tree in tree_list:
+        for tree in tree_list:
+            if type(tree_list[0]) == sklearn.tree._classes.DecisionTreeClassifier:
                 pred.append(tree.predict_proba(X)[:,1])
-                ind.append([int(x > 0) for x in tree.feature_importances_])
-        else:
-            for tree in tree_list:
+            else:
                 pred.append(tree.predict(X))
+
+            if (len(costs) == 0) & (len(groups) == 0):
                 ind.append([int(x > 0) for x in tree.feature_importances_])
+
+            elif (len(costs) != 0) & (len(groups) == 0):
+                cost_matrix = np.diag(costs) #create diagonal cost matrix
+                ind.append(np.dot(cost_matrix,
+                            [int(x > 0) for x in tree.feature_importances_]))
+
+            elif (len(costs) == 0) & (len(groups) != 0):
+                ind.append((np.dot(group_matrix,
+                [int(x > 0) for x in tree.feature_importances_])>0).astype(int))
 
         pred = np.transpose(np.array(pred,dtype = object))
         ind = np.transpose(ind)
@@ -416,82 +582,141 @@ class ControlBurnClassifier:
         self.features_selected_ = list(np.array(X.columns)[[i != 0 for i in imp1]])
         return
 
+    def solve_lasso_path(self, X,y ,
+                        n_alphas = 50, eps = 10**-3, costs = [],
+                         groups = [], kwargs = {}):
+        """ Compute the entire lasso regularization path using warm start
+        continuation. Returns a list of alphas and an numpy array of fitted
+        coefficients.
 
-    def solve_lasso_cvxpy(self):
-        """ Solves LASSO optimization problem using class attribute alpha as the
-        regularization parameter. Stores the selected features, weights, and
-        subforest.
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data.
+        y: numpy 1darray or pandas.Series
+            Input targets.
+        n_alphas: int
+            Number of alpha values to evaluate in the path.
+        eps: float
+            Ratio for computing the length of the path, indicates the lower bound of the log-space.
+        costs: numpy 1darray
+            List of feature costs.
+        groups: numpy 1darray
+            List of feature groupings.
+        kwargs: dict
+            Additional parameters for the lasso solver.
+
+        Returns
+        ----------
+        alphas: numpy 1darray
+            Array of alpha values evaluated.
+        coef_path: numpy ndarray
+            Array of LASSO solution coefficients.
+
         """
+        if type(X) == np.ndarray:
+            X = self.__numpy_to_pandas(X)
+
         if len(self.forest) == 0:
-            raise Exception("Build forest first.")
+            raise Exception("Build forest.")
+
+        if len(groups) >0:
+            group_matrix = np.column_stack((np.arange(len(X.columns))
+                                            ,groups,np.ones(len(X.columns))))
+            group_matrix = pd.DataFrame(group_matrix,
+                                        columns = ['feature','group','ind'])
+            group_matrix = group_matrix.pivot_table(index = 'feature', columns = 'group',
+                                values = 'ind').fillna(0).astype(int).values
+            group_matrix = np.transpose(group_matrix)
+
         alpha = self.alpha
-        X = self.X
-        y = self.y
         y = pd.Series(y)
         y.index = X.index
         tree_list = self.forest
+
         pred = []
         ind = []
 
-        if type(tree_list[0]) == sklearn.tree._classes.DecisionTreeClassifier:
-            for tree in tree_list:
-                pred.append(tree.predict_proba(X)[:,1])
+        for tree in tree_list:
+            pred.append(tree.predict(X))
+            if (len(costs) == 0) & (len(groups) == 0):
                 ind.append([int(x > 0) for x in tree.feature_importances_])
 
-        else:
-            for tree in tree_list:
-                pred.append(tree.predict(X))
-                ind.append([int(x > 0) for x in tree.feature_importances_])
+            elif (len(costs) != 0) & (len(groups) == 0):
+                cost_matrix = np.diag(costs) #create diagonal cost matrix
+                ind.append(np.dot(cost_matrix,
+                            [int(x > 0) for x in tree.feature_importances_]))
 
-        pred = np.transpose(pred)
+            elif (len(costs) == 0) & (len(groups) != 0):
+                ind.append((np.dot(group_matrix,
+                [int(x > 0) for x in tree.feature_importances_])>0).astype(int))
+
+        pred = np.transpose(np.array(pred,dtype = object))
         ind = np.transpose(ind)
-        w = cp.Variable(len(tree_list),nonneg=True)
-        constraints = []
 
-        if self.optimization_form == 'penalized':
-            loss = -cp.sum( cp.multiply(y, pred@ w ) - cp.logistic(pred @ w) )
-            objective = (1/len(y))*loss + alpha*cp.norm(cp.matmul(ind,w),1)
+        ind_vec=np.sum(ind,0)
+        inv_mat = np.linalg.inv(np.diag(ind_vec))
+        transformed_matix=np.matmul(pred,inv_mat)
 
+        alphas = np.flip(np.logspace(np.log10(10*eps),2,n_alphas))
 
-        if self.optimization_form == 'constrained':
-            objective = -cp.sum(cp.multiply(y, pred@ w) - cp.logistic(pred @ w))
-            constraints = [cp.norm(cp.matmul(ind,w),1)<= alpha]
+        clf = sklearn.linear_model.LogisticRegression(
+            penalty="l1",
+            solver="liblinear",
+            tol=1e-6,
+            max_iter=int(1e6),
+            warm_start=True,
+            intercept_scaling=10000.0,
+        )
 
-        prob = cp.Problem(cp.Minimize(objective),constraints)
+        coef_path = []
+        for alpha in alphas:
+            clf.set_params(C=1/alpha)
+            clf.fit(transformed_matix, y)
+            coef_path.append(clf.coef_.ravel().copy())
 
-        if self.solver == 'MOSEK':
-            prob.solve(solver = cp.MOSEK,mosek_params = {mosek.dparam.optimizer_max_time: 10000.0} )
-        else:
-            prob.solve(solver = self.solver)
+        self.alpha_range = alphas
+        self.coef_path = [np.dot(inv_mat,coef) for coef in coef_path]
 
-        weights = np.asarray(w.value)
-        weights[np.abs(weights) < self.threshold] = 0
-        self.weights = weights
-        self.subforest = list(np.array(tree_list)[[w_ind != 0 for w_ind in list(weights)]])
-        imp = []
-
-        for i in range(0,len(weights)):
-            imp.append(weights[i]*tree_list[i].feature_importances_)
-        imp1 = np.sum(imp, axis = 0)
-        self.feature_importances_ = imp1
-        self.features_selected_ = list(np.array(X.columns)[[i != 0 for i in imp1]])
-
-        return
+        return alphas,self.coef_path
 
     #sklearn-api wrapper functions
-    def fit(self,X,y):
-        """ Wrapper function, builds a forest and solves LASSO optimization Problem
-        to select a subforest. Trains final model on selected features.
+    def fit(self,X,y, costs = [], groups = [], sketching = 1.0):
+        """ Wrapper function, builds a forest and solves LASSO optimization problem
+        to select a subforest. Trains a final model polished model on the selected features.
+
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data.
+        y: numpy 1darray or pandas.Series
+            Input targets
+        costs: numpy 1darray
+            List of feature costs.
+        groups: numpy 1darray
+            List of feature groupings.
+        sketching: float
+            Proportion of training data to use for gaussian sketching.
+
         """
         self.build_forest_method(X,y)
-        self.solve_lasso()
+        self.solve_lasso( costs = costs, groups = groups, sketching = sketching)
         if len(self.features_selected_) == 0:
             self.trained_polish = y
         else:
             self.trained_polish = self.polish_method.fit(X[self.features_selected_],y)
 
     def predict(self,X):
-        """ Returns binary predictions of final model trained on selected features.
+        """ Returns binary predictions of polished model trained on selected features.
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data.
+
+        Returns
+        ----------
+        pred: numpy 1darray
+            Array of predictions.
         """
         if len(self.features_selected_) == 0:
             return np.repeat(round(np.mean(self.trained_polish)),len(X))
@@ -499,7 +724,16 @@ class ControlBurnClassifier:
             return self.trained_polish.predict(X[self.features_selected_])
 
     def predict_proba(self,X):
-        """ Returns class probability predictions of final model trained on selected features.
+        """ Returns class probabilities of polished model trained on selected features.
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data.
+
+        Returns
+        ----------
+        pred: numpy 1darray
+            Array of predictions.
         """
         if len(self.features_selected_) == 0:
             return np.repeat(np.mean(self.trained_polish),len(X))
@@ -508,6 +742,17 @@ class ControlBurnClassifier:
 
     def fit_transform(self,X,y):
         """ Returns dataframe of selected features.
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data.
+        y: numpy 1darray or pandas.Series
+            Input targets.
+
+        Returns
+        ----------
+        sparse_data: pandas.dataFrame
+            DataFrame containing selected features.
         """
         self.build_forest_method(X,y)
         self.solve_lasso()
@@ -516,17 +761,252 @@ class ControlBurnClassifier:
         else:
             return X[self.features_selected_]
 
+    def fit_cv(self,X,y, nfolds = 5, n_alphas = 50, eps = 10**-3, show_plot = True, kwargs = {}):
+        """ Compute the entire lasso path and select the best parameter using
+        a nfold cross validation. Returns the best regularization parameter,
+        support size, and selected features
+
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data.
+        y: numpy 1darray or pandas.Series
+            Input targets.
+        nfolds: int
+            Number of folds for cross validation.
+        n_alphas: int
+            Number of alpha values to evaluate in the path.
+        eps: float
+            Ratio for computing the length of the path, indicates the lower bound of the log-space.
+        show_plot: bool
+            Displays cross validation plot with optimal number of features.
+        kwargs: dict
+            Additional parameters for the lasso solver.
+
+        Returns
+        ----------
+        best_alpha: float
+            Best value of alpha selected by cross validation.
+
+        best_nfeats: int
+            Number of features selected by LASSO on the best value of alpha.
+
+        best_feats: numpy 1darray
+            Array of best features.
+
+
+    """
+
+        if type(X) == np.ndarray:
+            X = self.__numpy_to_pandas(X)
+
+        alpha = self.alpha
+        y = pd.Series(y)
+        y.index = X.index
+
+
+        kf = KFold(n_splits=nfolds)
+        acc_all = np.array([])
+        alphas_all = np.array([])
+        feats_all = []
+
+        for train_index, test_index in kf.split(X):
+            xTrain1, xTest1 = X.iloc[train_index], X.iloc[test_index]
+            yTrain1, yTest1 = y.iloc[train_index], y.iloc[test_index]
+            self.build_forest_method(xTrain1,yTrain1)
+            tree_list1 = self.forest
+            pred = []
+            ind = []
+
+            for tree in tree_list1:
+                pred.append(tree.predict(xTrain1))
+                ind.append([int(f > 0) for f in tree.feature_importances_])
+
+            pred = np.transpose(np.array(pred,dtype = object))
+            ind = np.transpose(ind)
+
+            ind_vec=np.sum(ind,0)
+            inv_mat = np.linalg.inv(np.diag(ind_vec))
+            transformed_matix=np.matmul(pred,inv_mat)
+
+            alphas = np.flip(np.logspace(np.log10(10*eps),2,n_alphas))
+
+            clf = sklearn.linear_model.LogisticRegression(
+                penalty="l1",
+                solver="liblinear",
+                tol=1e-6,
+                max_iter=int(1e6),
+                warm_start=True,
+                intercept_scaling=10000.0,
+            )
+
+            coef = []
+            intercepts = []
+            for alpha in alphas:
+                clf.set_params(C=1/alpha)
+                clf.fit(transformed_matix, yTrain1)
+                coef.append(clf.coef_.ravel().copy())
+                intercepts.append(clf.intercept_.copy()[0])
+
+            acc = []
+            alpha_list = []
+            feats_list = []
+            for i in range(0,len(coef)):
+                weights = inv_mat@coef[i]
+                ind = weights>0
+                selected_ensemble= np.array(tree_list1)[ind]
+                selected_weights = weights[ind]
+                if len(selected_ensemble) > 0:
+                    pred = 0
+                    feats_used = np.array([])
+                    for j in range(len(selected_ensemble)):
+                        pred = pred + selected_ensemble[j].predict(xTest1)*selected_weights[j]
+                        feats_used= np.append(feats_used,
+                                    X.columns[selected_ensemble[j].feature_importances_ >0].values)
+
+                    pred = pred + intercepts[i]
+                    pred = np.exp(pred)/(1+np.exp(pred))
+                    acc.append(sklearn.metrics.roc_auc_score(yTest1,pred))
+                    alpha_list.append(alphas[i])
+                    feats_all.append(list(set(feats_used)))
+
+            acc_all = np.append(acc_all,acc)
+            alphas_all = np.append(alphas_all,alpha_list)
+
+        results = pd.DataFrame(np.column_stack((alphas_all,acc_all,
+                        [len(x) for x in feats_all])),columns = ['alpha','accuracy','num_feats'])
+
+        results = results.sort_values('alpha',ascending = False)
+        results_agg = results.groupby('num_feats').agg(['mean','std']).reset_index()
+        results_agg = results_agg[results_agg['accuracy']['mean']<1]
+        best_nfeats = results_agg.sort_values(('accuracy','mean'),ascending = False)\
+        .head(1)['num_feats'].values[0]
+
+        best_feats = list(np.array(feats_all)\
+                       [[len(x) == best_nfeats for x in feats_all]])
+
+        best_feats = list(set([tuple(sorted(i)) for i in best_feats]))
+        best_alpha = results.sort_values('accuracy',
+                                        ascending = False)['alpha'].values[0]
+
+        self.X = X
+        self.Y = y
+        self.alpha = best_alpha
+        self.forest = []
+        self.subforest = []
+        self.weights = []
+        self.fit(X,y)
+        if show_plot == True:
+
+            fig, ax2 = plt.subplots(1,1, figsize = (6,5))
+            results_plot = results[results['accuracy']<1]
+            y_red_feats = results_agg.sort_values(('accuracy','mean'),ascending = False)\
+            .head(1)['accuracy']['mean'].values
+
+            results_agg = results.groupby('num_feats').agg(['mean','std']).reset_index()
+            results_agg = results_agg[results_agg['accuracy']['mean']<1]
+
+            ax2.errorbar(results_agg['num_feats'],\
+                         results_agg['accuracy']['mean'],results_agg['accuracy']['std'],
+                         alpha = 0.3, color = 'blue',zorder = 1)
+
+            ax2.scatter(results_agg['num_feats'],results_agg['accuracy']\
+                     ['mean'],color = 'blue')
+            ax2.scatter(best_nfeats,y_red_feats,color = 'red',zorder = 2)
+            ax2.set_xlabel('Number of Features Selected')
+            ax2.set_ylabel('Validation Auc')
+            plt.draw()
+
+
+        return best_alpha, best_nfeats, np.array(best_feats)
+
 class ControlBurnRegressor:
+    """
+
+    Attributes
+    ----------
+
+    alpha: float
+        Regularization hyperparameter.
+    max_depth: float
+        Maximum depth of trees to grow in the ensemble.
+    threshold: float
+        Convergence threshold.
+    tail: int
+        Number of iterations to check convergence on.
+    forest: list
+        List of DecisionTreeRegressor objects. Represents the full ensemble.
+    subforest: list
+        List of DecisionTreeRegressor objects. Represents the sparse ensemble.
+    features_selected_: list
+        List of features selected by the subforest.
+    feature_importances_: list
+        List of feature importance scores computed from the subforest.
+    weights: list
+        Solution coefficients to the LASSO optimization problem.
+    alpha_range:
+        Range of alphas enumerated when computing the regularization path.
+    coef_path:
+        LASSO solution coefficients obtained by computing the regularization path.
+    polish_method: function
+        Method used to polish the final model on the selected features.
+
+    """
     # Class attributes to store results.
     forest = []
     weights = []
     subforest = []
+
+
     alpha_range = []
     coef_path = []
 
     #Class attributes for parameters to determine convergence.
     threshold = 10**-3
     tail = 5
+
+    #ControlBurn parameters
+    max_depth = 10
+    alpha = 0.1
+    polish_method = RandomForestRegressor()
+
+    #Depriciated arguments
+    solver = 'ECOS_BB'
+    optimization_form= 'penalized'
+
+
+#initializer
+    def __init__(self, alpha = 0.1, max_depth = 10, build_forest_method = 'bagboost',
+    polish_method = RandomForestRegressor(max_features = 'sqrt') , custom_forest = [] ):
+
+        if build_forest_method not in ['bagboost','bag','doublebagboost','custom']:
+            raise ValueError("build_forest_method must be either 'bag', 'bagboost', 'doublebagboost', or 'custom' ")
+
+        if max_depth <= 0:
+            raise ValueError("max_depth must be greater than 0")
+
+        if alpha <= 0:
+            raise ValueError("alpha must be greater than 0")
+
+        self.alpha = alpha
+        self.max_depth = max_depth
+        self.optimization_form = 'penalized'
+        self.solver = 'ECOS_BB'
+        self.polish_method = polish_method
+        if  build_forest_method == 'bagboost':
+            self.build_forest_method = self.bagboost_forest
+        elif build_forest_method == 'bag':
+            self.build_forest_method = self.bag_forest
+        elif build_forest_method == 'doublebagboost':
+            self.build_forest_method = self.double_bagboost_forest
+
+        elif build_forest_method == 'custom':
+            if len(custom_forest) == 0:
+                raise ValueError("Must provide external tree list")
+            self.forest = custom_forest
+            self.build_forest_method = self.__skip_build_forest
+
+
 
     # Private Helper Methods
     def __loss_gradient(self,y, y_hat):
@@ -535,7 +1015,7 @@ class ControlBurnRegressor:
         return -(y-y_hat)
 
     def __numpy_to_pandas(self,X):
-        """ Helper function to convert numpy arrays to pandas DataFrame
+        """ Helper function to convert numpy arrays to pandas.dataFrame
         with fixed column names.
         """
         return pd.DataFrame(X,columns = ["f"+str(i) for i in range(X.shape[1])])
@@ -581,11 +1061,20 @@ class ControlBurnRegressor:
 
     #Forest Growing Methods
     def bag_forest(self,X,y):
-        """ Forest growing algorithm that uses the class attribute max_depth as
+        """
+        Forest growing algorithm that uses the class attribute max_depth as
         a hyperparameter.
         Adds trees of increasing depth to a bagged ensemble until max_depth is
         reached. The number of trees to add at each depth level is determined by
         checking if the training error converges.
+
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data.
+        y: numpy 1darray or pandas.Series
+            Input targets.
+
         """
 
         self.X = X
@@ -624,6 +1113,14 @@ class ControlBurnRegressor:
         trees to grow at each boosting iteration is determined by the convergence of
         the training error. Out-of-bag error is used to determine how many boosting iterations to
         conduct.
+
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data.
+        y: numpy 1darray or pandas.Series
+            Input targets.
+
         """
         threshold = self.threshold
         tail = self.tail
@@ -716,6 +1213,14 @@ class ControlBurnRegressor:
         trees to grow at each boosting iteration is determined by the convergence of
         the training error. Out-of-bag error is used to determine how many boosting iterations to
         conduct.
+
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data.
+        y: numpy 1darray or pandas.Series
+            Input targets.
+
         """
         threshold = self.threshold
         tail = self.tail
@@ -827,65 +1332,22 @@ class ControlBurnRegressor:
         self.forest = tree_list
         return
 
-
-    #optional arguments
-    max_depth = 10
-    build_forest_method = bagboost_forest
-    polish_method = RandomForestRegressor()
-    alpha = 0.1
-    solver = 'ECOS_BB'
-    optimization_form= 'penalized'
-
-    def skip_build_forest(self,X,y):
+    def __skip_build_forest(self,X,y):
+        """ Overide function to skip building a forest for custom ensembles
+        """
         self.X = X
         self.y = y
         return
 
-    #initializer
-    def __init__(self,alpha = 0.1,max_depth = 10, optimization_form= 'penalized',solver = 'ECOS_BB',build_forest_method = 'bagboost',
-    polish_method = RandomForestRegressor(max_features = 'sqrt') , custom_forest = [] ):
-        """
-        Initalizes a ControlBurnClassifier object. Arguments: {alpha: regularization parameter, max_depth: optional
-        parameter for incremental depth bagging, optimization_form: either 'penalized' or 'constrained', solver: cvxpy solver
-        used to solve optimization problem, build_forest_method: either 'bagboost' or 'bag',polish_method: final model to
-        fit on selected features}.
-        """
-        if optimization_form not in ['penalized','constrained']:
-            raise ValueError("optimization_form must be either 'penalized' or 'constrained")
-
-        if build_forest_method not in ['bagboost','bag','doublebagboost','custom']:
-            raise ValueError("build_forest_method must be either 'bag', 'bagboost', 'doublebagboost', or 'custom' ")
-
-        if max_depth <= 0:
-            raise ValueError("max_depth must be greater than 0")
-
-        if alpha <= 0:
-            raise ValueError("alpha must be greater than 0")
-
-        self.alpha = alpha
-        self.max_depth = max_depth
-        self.optimization_form = optimization_form
-        self.solver = solver
-        self.polish_method = polish_method
-        if  build_forest_method == 'bagboost':
-            self.build_forest_method = self.bagboost_forest
-        elif build_forest_method == 'bag':
-            self.build_forest_method = self.bag_forest
-        elif build_forest_method == 'doublebagboost':
-            self.build_forest_method = self.double_bagboost_forest
-
-        elif build_forest_method == 'custom':
-            if len(custom_forest) == 0:
-                raise ValueError("Must provide external tree list")
-            self.forest = custom_forest
-            self.build_forest_method = self.skip_build_forest
-
     #Optimization Methods
-    def solve_lasso_cvxpy(self):
+    def __solve_lasso_cvxpy(self):
         """ Solves LASSO optimization problem using class attribute alpha as the
         regularization parameter. Stores the selected features, weights, and
         subforest. Directly solves optimization problem directly via cvxpy.
         """
+        import mosek
+        import cvxpy as cp
+
         if len(self.forest) == 0:
             raise Exception("Build forest.")
         alpha = self.alpha
@@ -939,6 +1401,16 @@ class ControlBurnRegressor:
         """ Solves LASSO optimization problem using class attribute alpha as the
         regularization parameter. Stores the selected features, weights, and
         subforest.
+
+        Parameters
+        ----------
+        costs: numpy 1darray
+            List of feature costs.
+        groups: numpy 1darray
+            List of feature groupings.
+        sketching: float
+            Proportion of training data to use for gaussian sketching.
+
         """
         X = self.X
         if len(self.forest) == 0:
@@ -1014,12 +1486,24 @@ class ControlBurnRegressor:
         """ Selects the best subset of trees in the ensemble such that the
         total features used is equal to K. Best subset solver implemented using
         gurobi. Dependencies imported inside package since optional function.
+
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data.
+        y: numpy 1darray or pandas.Series
+            Input targets.
+        K: int
+            Number of features to select.
+        verbose: bool
+            Prints Gurobi output.
+
         """
 
         import gurobipy as gp
         from gurobipy import GRB
         from itertools import product
-        
+
         if len(self.forest) == 0:
             raise Exception("Build forest.")
 
@@ -1076,11 +1560,23 @@ class ControlBurnRegressor:
         self.features_selected_ = features_selected
         return
 
-
-
     def fit(self,X,y,costs = [], groups = [], sketching = 1.0):
-        """ Wrapper function, builds a forest and solves LASSO optimization Problem
-        to select a subforest. Trains final model on selected features.
+        """ Wrapper function, builds a forest and solves LASSO optimization problem
+        to select a subforest. Trains a final model polished model on the selected features.
+
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data.
+        y: numpy 1darray or pandas.Series
+            Input targets
+        costs: numpy 1darray
+            List of feature costs.
+        groups: numpy 1darray
+            List of feature groupings.
+        sketching: float
+            Proportion of training data to use for gaussian sketching.
+
         """
         if ( (round(np.mean(y))!= 0) | (round(np.std(y))!= 1)) :
             raise Exception("Please scale data before using ControlBurnRegressor.")
@@ -1096,7 +1592,18 @@ class ControlBurnRegressor:
             self.trained_polish = self.polish_method.fit(X[self.features_selected_],y)
 
     def predict(self,X):
-        """ Returns predictions of final model trained on selected features.
+        """ Returns predictions of polished model trained on selected features.
+
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data.
+
+        Returns
+        ----------
+        pred: numpy 1darray
+            Array of predictions.
+
         """
         if type(X) == np.ndarray:
             X = self.__numpy_to_pandas(X)
@@ -1109,6 +1616,18 @@ class ControlBurnRegressor:
 
     def fit_transform(self,X,y):
         """ Returns dataframe of selected features.
+
+            Parameters
+            ----------
+            X: pandas.dataFrame
+                Input data.
+            y: numpy 1darray or pandas.Series
+                Input targets.
+
+            Returns
+            ----------
+            sparse_data: pandas.dataFrame
+                DataFrame containing selected features.
         """
         if type(X) == np.ndarray:
             X = self.__numpy_to_pandas(X)
@@ -1126,6 +1645,29 @@ class ControlBurnRegressor:
         """ Compute the entire lasso regularization path using warm start
         continuation. Returns a list of alphas and an numpy array of fitted
         coefficients.
+
+        Parameters
+        ----------
+        X: pandas.dataFrame
+            Input data.
+        y: numpy 1darray or pandas.Series
+            Input targets.
+        n_alphas: int
+            Number of alpha values to evaluate in the path.
+        costs: numpy 1darray
+            List of feature costs.
+        groups: numpy 1darray
+            List of feature groupings.
+        kwargs: dict
+            Additional parameters for the lasso solver.
+
+        Returns
+        ----------
+        alphas: numpy 1darray
+            Array of alpha values evaluated.
+        coef_path: numpy ndarray
+            Array of LASSO solution coefficients.
+
         """
         if type(X) == np.ndarray:
             X = self.__numpy_to_pandas(X)
@@ -1179,11 +1721,39 @@ class ControlBurnRegressor:
         self.coef_path = [np.dot(inv_mat,coef) for coef in coef_path]
         return alphas,self.coef_path
 
-    ## TODO: complete this section
+
     def fit_cv(self,X,y, nfolds = 5, n_alphas = 500, show_plot = True, kwargs = {}):
         """ Compute the entire lasso path and select the best parameter using
             a nfold cross validation. Returns the best regularization parameter,
             support size, and selected features
+
+            Parameters
+            ----------
+            X: pandas.dataFrame
+                Input data.
+            y: numpy 1darray or pandas.Series
+                Input targets.
+            nfolds: int
+                Number of folds for cross validation.
+            n_alphas: int
+                Number of alpha values to evaluate in the path.
+            show_plot: bool
+                Displays cross validation plot with optimal number of features.
+            kwargs: dict
+                Additional parameters for the lasso solver.
+
+            Returns
+            ----------
+            best_alpha: float
+                Best value of alpha selected by cross validation.
+
+            best_nfeats: int
+                Number of features selected by LASSO on the best value of alpha.
+
+            best_feats: numpy 1darray
+                Array of best features.
+
+
         """
         if type(X) == np.ndarray:
             X = self.__numpy_to_pandas(X)
@@ -1297,4 +1867,4 @@ class ControlBurnRegressor:
             plt.draw()
 
 
-        return best_alpha, best_nfeats,best_feats
+        return best_alpha, best_nfeats, np.array(best_feats)
