@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to ControlBurn’s documentation! &mdash; ControlBurn v0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="#" class="icon icon-home"> ControlBurn
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Welcome to ControlBurn’s documentation!</a><ul>
+<li><a class="reference internal" href="#controlburnmodel-py">ControlBurnModel.py</a></li>
+<li><a class="reference internal" href="#controlburninterpret-py">ControlBurnInterpret.py</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">ControlBurn</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+      <li>Welcome to ControlBurn’s documentation!</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-ControlBurn.ControlBurnModel">
+<span id="welcome-to-controlburn-s-documentation"></span><h1>Welcome to ControlBurn’s documentation!<a class="headerlink" href="#module-ControlBurn.ControlBurnModel" title="Permalink to this heading"></a></h1>
+<section id="controlburnmodel-py">
+<h2>ControlBurnModel.py<a class="headerlink" href="#controlburnmodel-py" title="Permalink to this heading"></a></h2>
+<p>This module contains functions to build and burn forests and select
+hyperparameters.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ControlBurn.ControlBurnModel.</span></span><span class="sig-name descname"><span class="pre">ControlBurnClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">build_forest_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bagboost'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polish_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">RandomForestClassifier(max_features='sqrt')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_forest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier" title="Permalink to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.alpha">
+<span class="sig-name descname"><span class="pre">alpha</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.alpha" title="Permalink to this definition"></a></dt>
+<dd><p>Regularization hyperparameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.max_depth">
+<span class="sig-name descname"><span class="pre">max_depth</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.max_depth" title="Permalink to this definition"></a></dt>
+<dd><p>Maximum depth of trees to grow in the ensemble.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.threshold">
+<span class="sig-name descname"><span class="pre">threshold</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.threshold" title="Permalink to this definition"></a></dt>
+<dd><p>Convergence threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.tail">
+<span class="sig-name descname"><span class="pre">tail</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.tail" title="Permalink to this definition"></a></dt>
+<dd><p>Number of iterations to check convergence on.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.forest">
+<span class="sig-name descname"><span class="pre">forest</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.forest" title="Permalink to this definition"></a></dt>
+<dd><p>List of DecisionTreeRegressor objects. Represents the full ensemble.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.subforest">
+<span class="sig-name descname"><span class="pre">subforest</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.subforest" title="Permalink to this definition"></a></dt>
+<dd><p>List of DecisionTreeRegressor objects. Represents the sparse ensemble.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.features_selected_">
+<span class="sig-name descname"><span class="pre">features_selected_</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.features_selected_" title="Permalink to this definition"></a></dt>
+<dd><p>List of features selected by the subforest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.feature_importances_">
+<span class="sig-name descname"><span class="pre">feature_importances_</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.feature_importances_" title="Permalink to this definition"></a></dt>
+<dd><p>List of feature importance scores computed from the subforest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.weights">
+<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.weights" title="Permalink to this definition"></a></dt>
+<dd><p>Solution coefficients to the LASSO optimization problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.alpha_range">
+<span class="sig-name descname"><span class="pre">alpha_range</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.alpha_range" title="Permalink to this definition"></a></dt>
+<dd><p>Range of alphas enumerated when computing the regularization path.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.coef_path">
+<span class="sig-name descname"><span class="pre">coef_path</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.coef_path" title="Permalink to this definition"></a></dt>
+<dd><p>LASSO solution coefficients obtained by computing the regularization path.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.polish_method">
+<span class="sig-name descname"><span class="pre">polish_method</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.polish_method" title="Permalink to this definition"></a></dt>
+<dd><p>Method used to polish the final model on the selected features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.bag_forest">
+<span class="sig-name descname"><span class="pre">bag_forest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.bag_forest" title="Permalink to this definition"></a></dt>
+<dd><blockquote>
+<div><p>Forest growing algorithm that uses the class attribute max_depth as</p>
+</div></blockquote>
+<p>a hyperparameter.
+Adds trees of increasing depth to a bagged ensemble until max_depth is
+reached. The number of trees to add at each depth level is determined by
+checking if the training error converges.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pandas.dataFrame</em>) – Input data</p></li>
+<li><p><strong>y</strong> (<em>numpy 1darray</em><em> or </em><em>pandas.Series</em>) – Input targets</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.bagboost_forest">
+<span class="sig-name descname"><span class="pre">bagboost_forest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.bagboost_forest" title="Permalink to this definition"></a></dt>
+<dd><p>Bag-boosting forest growing algorithm, no hyperparameters needed. The number of
+trees to grow at each boosting iteration is determined by the convergence of
+the training error. Out-of-bag error is used to determine how many boosting iterations to
+conduct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pandas.dataFrame</em>) – Input data.</p></li>
+<li><p><strong>y</strong> (<em>numpy 1darray</em><em> or </em><em>pandas.Series</em>) – Input targets.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.double_bagboost_forest">
+<span class="sig-name descname"><span class="pre">double_bagboost_forest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.double_bagboost_forest" title="Permalink to this definition"></a></dt>
+<dd><p>Double bag-boosting forest growing algorithm, no hyperparameters needed. The number of
+trees to grow at each boosting iteration is determined by the convergence of
+the training error. Out-of-bag error is used to determine how many boosting iterations to
+conduct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pandas.dataFrame</em>) – Input data.</p></li>
+<li><p><strong>y</strong> (<em>numpy 1darray</em><em> or </em><em>pandas.Series</em>) – Input targets.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sketching</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Wrapper function, builds a forest and solves LASSO optimization problem
+to select a subforest. Trains a final model polished model on the selected features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pandas.dataFrame</em>) – Input data.</p></li>
+<li><p><strong>y</strong> (<em>numpy 1darray</em><em> or </em><em>pandas.Series</em>) – Input targets</p></li>
+<li><p><strong>costs</strong> (<em>numpy 1darray</em>) – List of feature costs.</p></li>
+<li><p><strong>groups</strong> (<em>numpy 1darray</em>) – List of feature groupings.</p></li>
+<li><p><strong>sketching</strong> (<em>float</em>) – Proportion of training data to use for gaussian sketching.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.fit_cv">
+<span class="sig-name descname"><span class="pre">fit_cv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nfolds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_alphas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.fit_cv" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the entire lasso path and select the best parameter using
+a nfold cross validation. Returns the best regularization parameter,
+support size, and selected features</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pandas.dataFrame</em>) – Input data.</p></li>
+<li><p><strong>y</strong> (<em>numpy 1darray</em><em> or </em><em>pandas.Series</em>) – Input targets.</p></li>
+<li><p><strong>nfolds</strong> (<em>int</em>) – Number of folds for cross validation.</p></li>
+<li><p><strong>n_alphas</strong> (<em>int</em>) – Number of alpha values to evaluate in the path.</p></li>
+<li><p><strong>eps</strong> (<em>float</em>) – Ratio for computing the length of the path, indicates the lower bound of the log-space.</p></li>
+<li><p><strong>show_plot</strong> (<em>bool</em>) – Displays cross validation plot with optimal number of features.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – Additional parameters for the lasso solver.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>best_alpha</strong> (<em>float</em>) – Best value of alpha selected by cross validation.</p></li>
+<li><p><strong>best_nfeats</strong> (<em>int</em>) – Number of features selected by LASSO on the best value of alpha.</p></li>
+<li><p><strong>best_feats</strong> (<em>numpy 1darray</em>) – Array of best features.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.fit_transform">
+<span class="sig-name descname"><span class="pre">fit_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.fit_transform" title="Permalink to this definition"></a></dt>
+<dd><p>Returns dataframe of selected features.
+:param X: Input data.
+:type X: pandas.dataFrame
+:param y: Input targets.
+:type y: numpy 1darray or pandas.Series</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>sparse_data</strong> – DataFrame containing selected features.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pandas.dataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Returns binary predictions of polished model trained on selected features.
+:param X: Input data.
+:type X: pandas.dataFrame</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>pred</strong> – Array of predictions.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy 1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.predict_proba">
+<span class="sig-name descname"><span class="pre">predict_proba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.predict_proba" title="Permalink to this definition"></a></dt>
+<dd><p>Returns class probabilities of polished model trained on selected features.
+:param X: Input data.
+:type X: pandas.dataFrame</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>pred</strong> – Array of predictions.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy 1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.solve_lasso">
+<span class="sig-name descname"><span class="pre">solve_lasso</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sketching</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.solve_lasso" title="Permalink to this definition"></a></dt>
+<dd><p>Solves LASSO optimization problem using class attribute alpha as the
+regularization parameter. Stores the selected features, weights, and
+subforest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>costs</strong> (<em>numpy 1darray</em>) – List of feature costs.</p></li>
+<li><p><strong>groups</strong> (<em>numpy 1darray</em>) – List of feature groupings.</p></li>
+<li><p><strong>sketching</strong> (<em>float</em>) – Proportion of training data to use for gaussian sketching.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnClassifier.solve_lasso_path">
+<span class="sig-name descname"><span class="pre">solve_lasso_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_alphas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier.solve_lasso_path" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the entire lasso regularization path using warm start
+continuation. Returns a list of alphas and an numpy array of fitted
+coefficients.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pandas.dataFrame</em>) – Input data.</p></li>
+<li><p><strong>y</strong> (<em>numpy 1darray</em><em> or </em><em>pandas.Series</em>) – Input targets.</p></li>
+<li><p><strong>n_alphas</strong> (<em>int</em>) – Number of alpha values to evaluate in the path.</p></li>
+<li><p><strong>eps</strong> (<em>float</em>) – Ratio for computing the length of the path, indicates the lower bound of the log-space.</p></li>
+<li><p><strong>costs</strong> (<em>numpy 1darray</em>) – List of feature costs.</p></li>
+<li><p><strong>groups</strong> (<em>numpy 1darray</em>) – List of feature groupings.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – Additional parameters for the lasso solver.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>alphas</strong> (<em>numpy 1darray</em>) – Array of alpha values evaluated.</p></li>
+<li><p><strong>coef_path</strong> (<em>numpy ndarray</em>) – Array of LASSO solution coefficients.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ControlBurn.ControlBurnModel.</span></span><span class="sig-name descname"><span class="pre">ControlBurnRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">build_forest_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bagboost'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polish_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">RandomForestRegressor(max_features='sqrt')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_forest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor" title="Permalink to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.alpha">
+<span class="sig-name descname"><span class="pre">alpha</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.alpha" title="Permalink to this definition"></a></dt>
+<dd><p>Regularization hyperparameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.max_depth">
+<span class="sig-name descname"><span class="pre">max_depth</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.max_depth" title="Permalink to this definition"></a></dt>
+<dd><p>Maximum depth of trees to grow in the ensemble.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.threshold">
+<span class="sig-name descname"><span class="pre">threshold</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.threshold" title="Permalink to this definition"></a></dt>
+<dd><p>Convergence threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.tail">
+<span class="sig-name descname"><span class="pre">tail</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.tail" title="Permalink to this definition"></a></dt>
+<dd><p>Number of iterations to check convergence on.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.forest">
+<span class="sig-name descname"><span class="pre">forest</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.forest" title="Permalink to this definition"></a></dt>
+<dd><p>List of DecisionTreeRegressor objects. Represents the full ensemble.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.subforest">
+<span class="sig-name descname"><span class="pre">subforest</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.subforest" title="Permalink to this definition"></a></dt>
+<dd><p>List of DecisionTreeRegressor objects. Represents the sparse ensemble.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.features_selected_">
+<span class="sig-name descname"><span class="pre">features_selected_</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.features_selected_" title="Permalink to this definition"></a></dt>
+<dd><p>List of features selected by the subforest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.feature_importances_">
+<span class="sig-name descname"><span class="pre">feature_importances_</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.feature_importances_" title="Permalink to this definition"></a></dt>
+<dd><p>List of feature importance scores computed from the subforest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.weights">
+<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.weights" title="Permalink to this definition"></a></dt>
+<dd><p>Solution coefficients to the LASSO optimization problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.alpha_range">
+<span class="sig-name descname"><span class="pre">alpha_range</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.alpha_range" title="Permalink to this definition"></a></dt>
+<dd><p>Range of alphas enumerated when computing the regularization path.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.coef_path">
+<span class="sig-name descname"><span class="pre">coef_path</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.coef_path" title="Permalink to this definition"></a></dt>
+<dd><p>LASSO solution coefficients obtained by computing the regularization path.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.polish_method">
+<span class="sig-name descname"><span class="pre">polish_method</span></span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.polish_method" title="Permalink to this definition"></a></dt>
+<dd><p>Method used to polish the final model on the selected features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.bag_forest">
+<span class="sig-name descname"><span class="pre">bag_forest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.bag_forest" title="Permalink to this definition"></a></dt>
+<dd><p>Forest growing algorithm that uses the class attribute max_depth as
+a hyperparameter.
+Adds trees of increasing depth to a bagged ensemble until max_depth is
+reached. The number of trees to add at each depth level is determined by
+checking if the training error converges.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pandas.dataFrame</em>) – Input data.</p></li>
+<li><p><strong>y</strong> (<em>numpy 1darray</em><em> or </em><em>pandas.Series</em>) – Input targets.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.bagboost_forest">
+<span class="sig-name descname"><span class="pre">bagboost_forest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.bagboost_forest" title="Permalink to this definition"></a></dt>
+<dd><p>Bag-boosting forest growing algorithm, no hyperparameters needed. The number of
+trees to grow at each boosting iteration is determined by the convergence of
+the training error. Out-of-bag error is used to determine how many boosting iterations to
+conduct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pandas.dataFrame</em>) – Input data.</p></li>
+<li><p><strong>y</strong> (<em>numpy 1darray</em><em> or </em><em>pandas.Series</em>) – Input targets.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.double_bagboost_forest">
+<span class="sig-name descname"><span class="pre">double_bagboost_forest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.double_bagboost_forest" title="Permalink to this definition"></a></dt>
+<dd><p>Double bag-boosting forest growing algorithm, no hyperparameters needed. The number of
+trees to grow at each boosting iteration is determined by the convergence of
+the training error. Out-of-bag error is used to determine how many boosting iterations to
+conduct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pandas.dataFrame</em>) – Input data.</p></li>
+<li><p><strong>y</strong> (<em>numpy 1darray</em><em> or </em><em>pandas.Series</em>) – Input targets.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sketching</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Wrapper function, builds a forest and solves LASSO optimization problem
+to select a subforest. Trains a final model polished model on the selected features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pandas.dataFrame</em>) – Input data.</p></li>
+<li><p><strong>y</strong> (<em>numpy 1darray</em><em> or </em><em>pandas.Series</em>) – Input targets</p></li>
+<li><p><strong>costs</strong> (<em>numpy 1darray</em>) – List of feature costs.</p></li>
+<li><p><strong>groups</strong> (<em>numpy 1darray</em>) – List of feature groupings.</p></li>
+<li><p><strong>sketching</strong> (<em>float</em>) – Proportion of training data to use for gaussian sketching.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.fit_cv">
+<span class="sig-name descname"><span class="pre">fit_cv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nfolds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_alphas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.fit_cv" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the entire lasso path and select the best parameter using
+a nfold cross validation. Returns the best regularization parameter,
+support size, and selected features</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pandas.dataFrame</em>) – Input data.</p></li>
+<li><p><strong>y</strong> (<em>numpy 1darray</em><em> or </em><em>pandas.Series</em>) – Input targets.</p></li>
+<li><p><strong>nfolds</strong> (<em>int</em>) – Number of folds for cross validation.</p></li>
+<li><p><strong>n_alphas</strong> (<em>int</em>) – Number of alpha values to evaluate in the path.</p></li>
+<li><p><strong>show_plot</strong> (<em>bool</em>) – Displays cross validation plot with optimal number of features.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – Additional parameters for the lasso solver.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>best_alpha</strong> (<em>float</em>) – Best value of alpha selected by cross validation.</p></li>
+<li><p><strong>best_nfeats</strong> (<em>int</em>) – Number of features selected by LASSO on the best value of alpha.</p></li>
+<li><p><strong>best_feats</strong> (<em>numpy 1darray</em>) – Array of best features.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.fit_transform">
+<span class="sig-name descname"><span class="pre">fit_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.fit_transform" title="Permalink to this definition"></a></dt>
+<dd><p>Returns dataframe of selected features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pandas.dataFrame</em>) – Input data.</p></li>
+<li><p><strong>y</strong> (<em>numpy 1darray</em><em> or </em><em>pandas.Series</em>) – Input targets.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>sparse_data</strong> – DataFrame containing selected features.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.dataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Returns predictions of polished model trained on selected features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>pandas.dataFrame</em>) – Input data.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>pred</strong> – Array of predictions.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy 1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.solve_l0">
+<span class="sig-name descname"><span class="pre">solve_l0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.solve_l0" title="Permalink to this definition"></a></dt>
+<dd><p>Selects the best subset of trees in the ensemble such that the
+total features used is equal to K. Best subset solver implemented using
+gurobi. Dependencies imported inside package since optional function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pandas.dataFrame</em>) – Input data.</p></li>
+<li><p><strong>y</strong> (<em>numpy 1darray</em><em> or </em><em>pandas.Series</em>) – Input targets.</p></li>
+<li><p><strong>K</strong> (<em>int</em>) – Number of features to select.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Prints Gurobi output.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.solve_lasso">
+<span class="sig-name descname"><span class="pre">solve_lasso</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sketching</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.solve_lasso" title="Permalink to this definition"></a></dt>
+<dd><p>Solves LASSO optimization problem using class attribute alpha as the
+regularization parameter. Stores the selected features, weights, and
+subforest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>costs</strong> (<em>numpy 1darray</em>) – List of feature costs.</p></li>
+<li><p><strong>groups</strong> (<em>numpy 1darray</em>) – List of feature groupings.</p></li>
+<li><p><strong>sketching</strong> (<em>float</em>) – Proportion of training data to use for gaussian sketching.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnModel.ControlBurnRegressor.solve_lasso_path">
+<span class="sig-name descname"><span class="pre">solve_lasso_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_alphas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">costs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor.solve_lasso_path" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the entire lasso regularization path using warm start
+continuation. Returns a list of alphas and an numpy array of fitted
+coefficients.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pandas.dataFrame</em>) – Input data.</p></li>
+<li><p><strong>y</strong> (<em>numpy 1darray</em><em> or </em><em>pandas.Series</em>) – Input targets.</p></li>
+<li><p><strong>n_alphas</strong> (<em>int</em>) – Number of alpha values to evaluate in the path.</p></li>
+<li><p><strong>costs</strong> (<em>numpy 1darray</em>) – List of feature costs.</p></li>
+<li><p><strong>groups</strong> (<em>numpy 1darray</em>) – List of feature groupings.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – Additional parameters for the lasso solver.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>alphas</strong> (<em>numpy 1darray</em>) – Array of alpha values evaluated.</p></li>
+<li><p><strong>coef_path</strong> (<em>numpy ndarray</em>) – Array of LASSO solution coefficients.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<span class="target" id="module-ControlBurn.ControlBurnInterpret"></span><section id="controlburninterpret-py">
+<h2>ControlBurnInterpret.py<a class="headerlink" href="#controlburninterpret-py" title="Permalink to this heading"></a></h2>
+<p>This module contains functions to interpret fitted ControlBurn objects.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretClassifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ControlBurn.ControlBurnInterpret.</span></span><span class="sig-name descname"><span class="pre">InterpretClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ControlBurnClassifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretClassifier" title="Permalink to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretClassifier.cb">
+<span class="sig-name descname"><span class="pre">cb</span></span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretClassifier.cb" title="Permalink to this definition"></a></dt>
+<dd><p>Fitted ControlBurnClassifier object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#ControlBurn.ControlBurnModel.ControlBurnClassifier" title="ControlBurn.ControlBurnModel.ControlBurnClassifier">ControlBurnClassifier</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretClassifier.X">
+<span class="sig-name descname"><span class="pre">X</span></span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretClassifier.X" title="Permalink to this definition"></a></dt>
+<dd><p>Input data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>pandas.dataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretClassifier.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretClassifier.y" title="Permalink to this definition"></a></dt>
+<dd><p>Input targets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>numpy 1darray or pandas Series:</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretClassifier.list_subforest">
+<span class="sig-name descname"><span class="pre">list_subforest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretClassifier.list_subforest" title="Permalink to this definition"></a></dt>
+<dd><p>Lists the features used in each tree of the selected subforest to
+give a sense of model structure, returns the array of features used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>show_plot</strong> (<em>bool</em>) – Displays visualization.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>features_used</strong> – List of features used each tree in the selected model.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretClassifier.plot_feature_importances">
+<span class="sig-name descname"><span class="pre">plot_feature_importances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretClassifier.plot_feature_importances" title="Permalink to this definition"></a></dt>
+<dd><p>Plots a bar plot of the weighted feature importance scores
+in the subforest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show_plot</strong> (<em>bool</em>) – Displays visualization.</p></li>
+<li><p><strong>groups</strong> (<em>list</em>) – List that indicates which features belong to which groups</p></li>
+<li><p><strong>group_names</strong> (<em>list</em>) – List of group names</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>feature_importances</strong> – List of features in the subforest with associated feature importance scores</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.2darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretClassifier.plot_pairwise_interactions">
+<span class="sig-name descname"><span class="pre">plot_pairwise_interactions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretClassifier.plot_pairwise_interactions" title="Permalink to this definition"></a></dt>
+<dd><p>Plot a heatmap showing impact of pairwise interaction on
+the response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feature1</strong> (<em>string</em>) – Feature name.</p></li>
+<li><p><strong>feature2</strong> (<em>string</em>) – Feature name.</p></li>
+<li><p><strong>show_plot</strong> (<em>bool</em>) – Displays visualization.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>pairwise_df</strong> – Dataframe of pairwise interaction contributions.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretClassifier.plot_regularization_path">
+<span class="sig-name descname"><span class="pre">plot_regularization_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">more_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretClassifier.plot_regularization_path" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the LASSO regularization path for a ControlBurnRegressor.
+Feature importance for a feature computed as the weighted sum of
+feature importances for each tree in the selected subforest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show_plot</strong> (<em>bool</em>) – Displays visualization.</p></li>
+<li><p><strong>more_colors</strong> (<em>int</em>) – Number of additional colors to include.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>regularization_df</strong> – Dataframe of contributions along regularization path.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretClassifier.plot_single_feature_shape">
+<span class="sig-name descname"><span class="pre">plot_single_feature_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretClassifier.plot_single_feature_shape" title="Permalink to this definition"></a></dt>
+<dd><p>Plot a shape function that demonstrates the contribution of single
+feature trees on the response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feature</strong> (<em>string</em>) – Feature name.</p></li>
+<li><p><strong>show_plot</strong> (<em>bool</em>) – Displays visualization.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretRegressor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ControlBurn.ControlBurnInterpret.</span></span><span class="sig-name descname"><span class="pre">InterpretRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ControlBurnRegressor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretRegressor" title="Permalink to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretRegressor.cb">
+<span class="sig-name descname"><span class="pre">cb</span></span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretRegressor.cb" title="Permalink to this definition"></a></dt>
+<dd><p>Fitted ControlBurnRegressor object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#ControlBurn.ControlBurnModel.ControlBurnRegressor" title="ControlBurn.ControlBurnModel.ControlBurnRegressor">ControlBurnRegressor</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretRegressor.X">
+<span class="sig-name descname"><span class="pre">X</span></span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretRegressor.X" title="Permalink to this definition"></a></dt>
+<dd><p>Input data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>pandas.dataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretRegressor.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretRegressor.y" title="Permalink to this definition"></a></dt>
+<dd><p>Input targets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>numpy 1darray or pandas Series:</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretRegressor.list_subforest">
+<span class="sig-name descname"><span class="pre">list_subforest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretRegressor.list_subforest" title="Permalink to this definition"></a></dt>
+<dd><p>Lists the features used in each tree of the selected subforest to
+give a sense of model structure, returns the array of features used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>show_plot</strong> (<em>bool</em>) – Displays visualization.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>features_used</strong> – List of features used each tree in the selected model.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretRegressor.plot_feature_importances">
+<span class="sig-name descname"><span class="pre">plot_feature_importances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretRegressor.plot_feature_importances" title="Permalink to this definition"></a></dt>
+<dd><p>Plots a bar plot of the weighted feature importance scores
+in the subforest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show_plot</strong> (<em>bool</em>) – Displays visualization.</p></li>
+<li><p><strong>groups</strong> (<em>list</em>) – List that indicates which features belong to which groups</p></li>
+<li><p><strong>group_names</strong> (<em>list</em>) – List of group names</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>feature_importances</strong> – List of features in the subforest with associated feature importance scores</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.2darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretRegressor.plot_pairwise_interactions">
+<span class="sig-name descname"><span class="pre">plot_pairwise_interactions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretRegressor.plot_pairwise_interactions" title="Permalink to this definition"></a></dt>
+<dd><p>Plot a heatmap showing impact of pairwise interaction on
+the response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feature1</strong> (<em>string</em>) – Feature name.</p></li>
+<li><p><strong>feature2</strong> (<em>string</em>) – Feature name.</p></li>
+<li><p><strong>show_plot</strong> (<em>bool</em>) – Displays visualization.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>pairwise_df</strong> – Dataframe of pairwise interaction contributions.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretRegressor.plot_regularization_path">
+<span class="sig-name descname"><span class="pre">plot_regularization_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">more_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretRegressor.plot_regularization_path" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the LASSO regularization path for a ControlBurnRegressor.
+Feature importance for a feature computed as the weighted sum of
+feature importances for each tree in the selected subforest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show_plot</strong> (<em>bool</em>) – Displays visualization.</p></li>
+<li><p><strong>more_colors</strong> (<em>int</em>) – Number of additional colors to include.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>regularization_df</strong> – Dataframe of contributions along regularization path.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ControlBurn.ControlBurnInterpret.InterpretRegressor.plot_single_feature_shape">
+<span class="sig-name descname"><span class="pre">plot_single_feature_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ControlBurn.ControlBurnInterpret.InterpretRegressor.plot_single_feature_shape" title="Permalink to this definition"></a></dt>
+<dd><p>Plot a shape function that demonstrates the contribution of single
+feature trees on the response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feature</strong> (<em>string</em>) – Feature name.</p></li>
+<li><p><strong>show_plot</strong> (<em>bool</em>) – Displays visualization.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Brian Liu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
