@@ -19,10 +19,6 @@ affiliations:
    index: 2
  - name: Management Science and Engineering, Stanford University
    index: 3
-date: "`r Sys.Date()`"
-output:
-  pdf_document: default
-  html_document: default
 bibliography: refs.bib
 ---
 # Summary
